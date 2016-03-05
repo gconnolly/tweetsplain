@@ -6,4 +6,4 @@ app.post('/', (req, res) => {
   res.end()
 })
 
-app.listen(80, () => console.log('listening 80'))
+app.listen(process.env.PORT || 8080, () => console.log('listening ' + (process.env.PORT || 8080)))
