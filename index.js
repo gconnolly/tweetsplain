@@ -29,15 +29,13 @@ twitter.getRequestToken(function(error, requestToken, requestTokenSecret, result
 app.use(bodyParser.json());
 
 app.post('/', (req, res) => {
-  console.log('test')
   twitter.search(
       { q: '"' + req.body.text + '"' },
-      sessionAccessToken,
-      sessionAccessTokenSecret,
+      sessionRequestToken,
+      sessionRequestTokenSecret,
       (err, data, response) => {
-        console.log(err)
-        console.log(data)
-        console.log(response)
+        console.log('error: ' + err)
+        console.log('data: ' + data)
       })
 
   res.end()
