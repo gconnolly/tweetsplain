@@ -10,6 +10,7 @@ const twitter = new twitterAPI({
   consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
   callback: process.env.TWITTER_OAUTH_CALLBACK || 'http://localhost:8080/oauth'
 })
+const bigInt = require("big-integer")
 
 let sessionRequestToken
 let sessionRequestTokenSecret
@@ -32,20 +33,17 @@ app.use(bodyParser.json())
 app.post('/', (req, res) => {
   twitter.search(
     {
-      q: '"' + req.body.text + '"'
+      q: '"' + req.body.text + '"',
+      max_id: bigInt(twitterParse(req.body.link).id).minus(1).toString()
     },
     sessionAccessToken,
     sessionAccessTokenSecret,
     (err, data, response) => {
-      let s = data.statuses.find((status) => {
-        return status.user.screen_name != 'horse_js'
-      })
-
-      if (s) {
+      if (data.statuses[0]) {
         twitter.statuses(
           'update',
           {
-            status: 'ney ' + s.id_str
+            status: 'ney ' + data.statuses[0].id_str
           },
           sessionAccessToken,
           sessionAccessTokenSecret,
