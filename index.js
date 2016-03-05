@@ -6,4 +6,4 @@ app.post('/', (req, res) => {
   res.end()
 })
 
-app.listen(3000, () => console.log('listening 3000'))
+app.listen(80, () => console.log('listening 80'))
