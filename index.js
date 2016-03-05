@@ -34,8 +34,7 @@ app.post('/', (req, res) => {
     sessionAccessToken,
     sessionAccessTokenSecret,
     (err, data, response) => {
-      console.log('error: ' + err)
-      console.log('data: ' + data)
+      console.log(data)
     })
 
   res.end()
