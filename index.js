@@ -31,7 +31,7 @@ app.post('/', (req, res) => {
   res.end()
 })
 
-app.post('/oauth', (req, res) => {
+app.get('/oauth', (req, res) => {
   console.log(req)
   res.end()
 })
