@@ -1,0 +1,23 @@
+{
+  "name": "sj_nialpsroh",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.13.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gconnolly/sj_nialpsroh.git"
+  },
+  "author": "Gene Connolly",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gconnolly/sj_nialpsroh/issues"
+  },
+  "homepage": "https://github.com/gconnolly/sj_nialpsroh#readme"
+}
