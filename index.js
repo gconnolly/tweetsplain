@@ -12,6 +12,8 @@ const twitter = new twitterAPI({
 })
 let sessionRequestToken
 let sessionRequestTokenSecret
+let sessionAccessToken
+let sessionAccessTokenSecret
 
 twitter.getRequestToken(function(error, requestToken, requestTokenSecret, results){
     if (error) {
@@ -27,12 +29,18 @@ twitter.getRequestToken(function(error, requestToken, requestTokenSecret, result
 app.use(bodyParser.json());
 
 app.post('/', (req, res) => {
-  console.log(twitterParse(req.body.link).id)
+  twitter.search({ q: '"' + twitterParse(req.body.link).text + '"' }, sessionAccessToken, sessionAccessTokenSecret, (err, data, response) => {
+    console.log(err)
+    console.log(data)
+    console.log(response)
+  })
+
   res.end()
 })
 
 app.get('/oauth', (req, res) => {
-  console.log(req)
+  sessionAccessToken = req.query.oauth_token
+  sessionAccessTokenSecret = req.query.oauth_verifier
   res.end()
 })
 
