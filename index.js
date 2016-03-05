@@ -29,6 +29,7 @@ twitter.getRequestToken(function(error, requestToken, requestTokenSecret, result
 app.use(bodyParser.json());
 
 app.post('/', (req, res) => {
+  console.log('test')
   twitter.search(
       { q: '"' + twitterParse(req.body.link).text + '"' },
       sessionAccessToken,
