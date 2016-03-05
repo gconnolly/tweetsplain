@@ -31,7 +31,7 @@ app.use(bodyParser.json());
 app.post('/', (req, res) => {
   console.log('test')
   twitter.search(
-      { q: '"' + twitterParse(req.body.link).text + '"' },
+      { q: '"' + req.body.text + '"' },
       sessionAccessToken,
       sessionAccessTokenSecret,
       (err, data, response) => {
