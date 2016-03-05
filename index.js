@@ -41,7 +41,7 @@ app.post('/', (req, res) => {
         twitter.statuses(
           'update',
           {
-            status: 'ney ' + data.statuses[0].id_str
+            status: 'ney ' + data.statuses[1].id_str
           },
           sessionAccessToken,
           sessionAccessTokenSecret,
