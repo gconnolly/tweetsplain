@@ -39,6 +39,10 @@ app.post('/', (req, res) => {
     sessionAccessToken,
     sessionAccessTokenSecret,
     (err, data, response) => {
+      console.log(data.search_metadata.count)
+      console.log(data.search_metadata.query)
+      console.log(data.search_metadata.max_id)
+      onsole.log(data.search_metadata.count)
       if (data.statuses[0]) {
         console.log(data.statuses[0])
         twitter.statuses(
