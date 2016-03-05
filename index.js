@@ -40,7 +40,10 @@ app.post('/', (req, res) => {
     sessionAccessToken,
     sessionAccessTokenSecret,
     (err, data, response) => {
-      if (data.statuses[0]) {
+      if(err) {
+        console.log(err)
+      }
+      else if (data && data.statuses && data.statuses[0]) {
         console.log('@horse_js @' + data.statuses[0].user.screen_name + ' https://twitter.com/' + data.statuses[0].user.screen_name + '/status/' + data.statuses[0].id_str)
         twitter.statuses(
           'update',
