@@ -31,11 +31,13 @@ app.use(bodyParser.json())
 
 app.post('/', (req, res) => {
   twitter.search(
-    { q: '"' + req.body.text + '"' },
+    {
+      q: '"' + req.body.text + '"'
+    },
     sessionAccessToken,
     sessionAccessTokenSecret,
     (err, data, response) => {
-      if (data.statuses[0]) {
+      if (data.statuses[1]) {
         twitter.statuses(
           'update',
           {
