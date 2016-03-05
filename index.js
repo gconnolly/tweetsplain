@@ -44,12 +44,11 @@ app.post('/', (req, res) => {
         console.log(err)
       }
       else if (data && data.statuses && data.statuses[0]) {
-        console.log('@horse_js @' + data.statuses[0].user.screen_name + ' https://twitter.com/' + data.statuses[0].user.screen_name + '/status/' + data.statuses[0].id_str)
         twitter.statuses(
           'update',
           {
-            status: 'ney ' + data.statuses[0].id_str//,
-            //in_reply_to_status_id: twitterId
+            status: '@horse_js @' + data.statuses[0].user.screen_name + ' https://twitter.com/' + data.statuses[0].user.screen_name + '/status/' + data.statuses[0].id_str,
+            in_reply_to_status_id: twitterId
           },
           sessionAccessToken,
           sessionAccessTokenSecret,
