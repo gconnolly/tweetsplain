@@ -31,21 +31,22 @@ twitter.getRequestToken(function (error, requestToken, requestTokenSecret, resul
 app.use(bodyParser.json())
 
 app.post('/', (req, res) => {
+  const twitterId = twitterParse(req.body.link).id
   twitter.search(
     {
       q: req.body.text,
-      max_id: bigInt(twitterParse(req.body.link).id).minus(1).toString()
+      max_id: bigInt(twitterId).minus(1).toString()
     },
     sessionAccessToken,
     sessionAccessTokenSecret,
     (err, data, response) => {
-      console.log(data)
       if (data.statuses[0]) {
-        console.log(data.statuses[0])
+        console.log('@horse_js @' + data.statuses[0].user.screen_name + ' https://twitter.com/' + data.statuses[0].user.screen_name + '/status/' + data.statuses[0].id_str)
         twitter.statuses(
           'update',
           {
-            status: 'ney ' + data.statuses[0].id_str
+            status: 'ney ' + data.statuses[0].id_str//,
+            //in_reply_to_status_id: twitterId
           },
           sessionAccessToken,
           sessionAccessTokenSecret,
