@@ -37,11 +37,15 @@ app.post('/', (req, res) => {
     sessionAccessToken,
     sessionAccessTokenSecret,
     (err, data, response) => {
-      if (data.statuses[1]) {
+      let s = data.statuses.find((status) => {
+        return status.user.screen_name != 'horse_js'
+      })
+
+      if (s) {
         twitter.statuses(
           'update',
           {
-            status: 'ney ' + data.statuses[1].id_str
+            status: 'ney ' + s.id_str
           },
           sessionAccessToken,
           sessionAccessTokenSecret,
