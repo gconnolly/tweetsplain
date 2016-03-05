@@ -10,6 +10,7 @@ const twitter = new twitterAPI({
   consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
   callback: process.env.TWITTER_OAUTH_CALLBACK || 'http://localhost:8080/oauth'
 })
+
 let sessionRequestToken
 let sessionRequestTokenSecret
 let sessionAccessToken
@@ -34,9 +35,22 @@ app.post('/', (req, res) => {
     sessionAccessToken,
     sessionAccessTokenSecret,
     (err, data, response) => {
-      console.log(data)
+      if (data.statuses[0]) {
+        twitter.statuses(
+          'update',
+          {
+            status: 'ney ' + data.statuses[0].id_str
+          },
+          sessionAccessToken,
+          sessionAccessTokenSecret,
+          function (error, data, response) {
+            if (error) {
+              console.log(error)
+            }
+          }
+        )
+      }
     })
-
   res.end()
 })
 
@@ -59,16 +73,11 @@ app.get('/oauth', (req, res) => {
             if (error) {
               console.log(error)
             } else {
-              // accessToken and accessTokenSecret can now be used to make api-calls (not yet implemented)
-              // data contains the user-data described in the official Twitter-API-docs
-              // you could e.g. display his screen_name
               console.log(data['screen_name'])
             }
           })
       }
     })
-
-
 
   res.end()
 })
