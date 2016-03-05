@@ -33,13 +33,14 @@ app.use(bodyParser.json())
 app.post('/', (req, res) => {
   twitter.search(
     {
-      q: '"' + req.body.text + '"',
+      q: req.body.text,
       max_id: bigInt(twitterParse(req.body.link).id).minus(1).toString()
     },
     sessionAccessToken,
     sessionAccessTokenSecret,
     (err, data, response) => {
       if (data.statuses[0]) {
+        console.log(data.statuses[0])
         twitter.statuses(
           'update',
           {
