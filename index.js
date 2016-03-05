@@ -40,7 +40,6 @@ app.post('/', (req, res) => {
     sessionAccessTokenSecret,
     (err, data, response) => {
       console.log(data)
-      onsole.log(data.search_metadata.count)
       if (data.statuses[0]) {
         console.log(data.statuses[0])
         twitter.statuses(
