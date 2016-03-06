@@ -70,8 +70,14 @@ app.get('/authenticate', (req, res) => {
     if (error) {
       console.log('Error getting OAuth request token : ' + error)
     } else {
-      client.set('request', { token: requestToken, tokenSecret: requestTokenSecret })
-      res.redirect(twitter.getAuthUrl(requestToken))
+      client.set('request', { token: requestToken, tokenSecret: requestTokenSecret }, (error, result) => {
+        if (error) {
+          console.log(error)
+        } else {
+          res.redirect(twitter.getAuthUrl(requestToken))
+        }
+      })
+
     }
   })
 })
@@ -80,7 +86,7 @@ app.get('/oauth', (req, res) => {
   client.get('request', (error, request) => {
     if (error) {
       console.log(error)
-    } else if(request) {
+    } else if (request) {
       console.log('t: ' + request.token)
       console.log('ts: ' + request.tokenSecret)
       twitter.getAccessToken(
@@ -91,8 +97,6 @@ app.get('/oauth', (req, res) => {
           if (error) {
             console.log(error)
           } else {
-            client.set('access', { token: accessToken, tokenSecret: accessTokenSecret })
-
             twitter.verifyCredentials(
               accessToken,
               accessTokenSecret,
@@ -101,7 +105,13 @@ app.get('/oauth', (req, res) => {
                 if (error) {
                   console.log(error)
                 } else {
-                  res.send(data['screen_name'])
+                  client.set('access', { token: accessToken, tokenSecret: accessTokenSecret }, (error, result) => {
+                    if (error) {
+                      console.log(error)
+                    } else {
+                      res.send(data['screen_name'])
+                    }
+                  })
                 }
               })
           }
