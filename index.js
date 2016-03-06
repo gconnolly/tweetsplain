@@ -29,7 +29,8 @@ app.post('/', (req, res) => {
   client.get('access', (error, access) => {
     if (error) {
       console.log(error)
-    } else if (access.token && access.tokenSecret) {
+    } else if (access) {
+      console.log(access)
       twitter.search(
         {
           q: req.body.text,
@@ -78,7 +79,8 @@ app.get('/oauth', (req, res) => {
   client.get('request', (error, request) => {
     if (error) {
       console.log(error)
-    } else {
+    } else if(request) {
+      console.log(request)
       twitter.getAccessToken(
         request.token,
         request.tokenSecret,
