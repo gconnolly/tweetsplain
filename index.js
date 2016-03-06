@@ -30,7 +30,8 @@ app.post('/', (req, res) => {
     if (error) {
       console.log(error)
     } else if (access) {
-      console.log(access)
+      console.log(access.token)
+      console.log(access.tokenSecret)
       twitter.search(
         {
           q: req.body.text,
@@ -80,7 +81,8 @@ app.get('/oauth', (req, res) => {
     if (error) {
       console.log(error)
     } else if(request) {
-      console.log(request)
+      console.log(request.token)
+      console.log(request.tokenSecret)
       twitter.getAccessToken(
         request.token,
         request.tokenSecret,
