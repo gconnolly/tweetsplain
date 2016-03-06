@@ -70,6 +70,7 @@ app.get('/authenticate', (req, res) => {
     if (error) {
       console.log('Error getting OAuth request token : ' + error)
     } else {
+      client.del('request');
       client.hmset('request', 'token', requestToken, 'tokenSecret', requestTokenSecret, (error, result) => {
         if (error) {
           console.log(error)
@@ -105,6 +106,7 @@ app.get('/oauth', (req, res) => {
                 if (error) {
                   console.log(error)
                 } else {
+                  client.del('access');
                   client.hmset('access', 'token', accessToken, 'tokenSecret', accessTokenSecret, (error, result) => {
                     if (error) {
                       console.log(error)
