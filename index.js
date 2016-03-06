@@ -70,7 +70,7 @@ app.get('/authenticate', (req, res) => {
     if (error) {
       console.log('Error getting OAuth request token : ' + error)
     } else {
-      client.set('request', { token: requestToken, tokenSecret: requestTokenSecret }, (error, result) => {
+      client.HMSET('request', { token: requestToken, tokenSecret: requestTokenSecret }, (error, result) => {
         if (error) {
           console.log(error)
         } else {
@@ -105,7 +105,7 @@ app.get('/oauth', (req, res) => {
                 if (error) {
                   console.log(error)
                 } else {
-                  client.set('access', { token: accessToken, tokenSecret: accessTokenSecret }, (error, result) => {
+                  client.HMSET('access', { token: accessToken, tokenSecret: accessTokenSecret }, (error, result) => {
                     if (error) {
                       console.log(error)
                     } else {
