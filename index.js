@@ -1,10 +1,10 @@
 /* globals process */
 'use strict'
 
-const express = require('express')
-const app = express()
-const bodyParser = require('body-parser')
+// other
+const bigInt = require('big-integer')
 
+// twitter api
 const twitterParse = require('twitter-url-parser')
 const twitterAPI = require('node-twitter-api')
 const twitter = new twitterAPI({
@@ -13,14 +13,18 @@ const twitter = new twitterAPI({
   callback: process.env.TWITTER_OAUTH_CALLBACK || 'http://localhost:8080/oauth'
 })
 
+// redis
 const redis = require('redis')
 const client = redis.createClient(process.env.REDIS_URL)
-
-const bigInt = require('big-integer')
 
 client.on('error', (error) => {
   console.log(error)
 })
+
+// express
+const express = require('express')
+const app = express()
+const bodyParser = require('body-parser')
 
 app.use(bodyParser.json())
 
@@ -30,8 +34,6 @@ app.post('/', (req, res) => {
     if (error) {
       console.log(error)
     } else if (access) {
-      console.log('t: ' + access.token)
-      console.log('ts: ' + access.tokenSecret)
       twitter.search(
         {
           q: req.body.text,
@@ -47,8 +49,8 @@ app.post('/', (req, res) => {
             twitter.statuses(
               'update',
               {
-                status: 'ney ' + data.statuses[0].id_str // '@horse_js @' + data.statuses[0].user.screen_name + ' https://twitter.com/' + data.statuses[0].user.screen_name + '/status/' + data.statuses[0].id_str,
-              // in_reply_to_status_id: twitterId
+                status: '@horse_js @' + data.statuses[0].user.screen_name + ' https://twitter.com/' + data.statuses[0].user.screen_name + '/status/' + data.statuses[0].id_str,
+                in_reply_to_status_id: twitterId
               },
               access.token,
               access.tokenSecret,
@@ -70,7 +72,7 @@ app.get('/authenticate', (req, res) => {
     if (error) {
       console.log('Error getting OAuth request token : ' + error)
     } else {
-      client.del('request');
+      client.del('request')
       client.hmset('request', 'token', requestToken, 'tokenSecret', requestTokenSecret, (error, result) => {
         if (error) {
           console.log(error)
@@ -88,8 +90,6 @@ app.get('/oauth', (req, res) => {
     if (error) {
       console.log(error)
     } else if (request) {
-      console.log('t: ' + request.token)
-      console.log('ts: ' + request.tokenSecret)
       twitter.getAccessToken(
         request.token,
         request.tokenSecret,
@@ -106,7 +106,7 @@ app.get('/oauth', (req, res) => {
                 if (error) {
                   console.log(error)
                 } else {
-                  client.del('access');
+                  client.del('access')
                   client.hmset('access', 'token', accessToken, 'tokenSecret', accessTokenSecret, (error, result) => {
                     if (error) {
                       console.log(error)
