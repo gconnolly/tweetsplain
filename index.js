@@ -26,7 +26,7 @@ app.use(bodyParser.json())
 
 app.post('/', (req, res) => {
   const twitterId = twitterParse(req.body.link).id
-  client.get('access', (error, access) => {
+  client.hgetall('access', (error, access) => {
     if (error) {
       console.log(error)
     } else if (access) {
@@ -70,7 +70,7 @@ app.get('/authenticate', (req, res) => {
     if (error) {
       console.log('Error getting OAuth request token : ' + error)
     } else {
-      client.HMSET('request', { token: requestToken, tokenSecret: requestTokenSecret }, (error, result) => {
+      client.hmset('request', 'token', requestToken, 'tokenSecret', requestTokenSecret, (error, result) => {
         if (error) {
           console.log(error)
         } else {
@@ -83,7 +83,7 @@ app.get('/authenticate', (req, res) => {
 })
 
 app.get('/oauth', (req, res) => {
-  client.get('request', (error, request) => {
+  client.hgetall('request', (error, request) => {
     if (error) {
       console.log(error)
     } else if (request) {
@@ -105,7 +105,7 @@ app.get('/oauth', (req, res) => {
                 if (error) {
                   console.log(error)
                 } else {
-                  client.HMSET('access', { token: accessToken, tokenSecret: accessTokenSecret }, (error, result) => {
+                  client.hmset('access', 'token', accessToken, 'tokenSecret', accessTokenSecret, (error, result) => {
                     if (error) {
                       console.log(error)
                     } else {
