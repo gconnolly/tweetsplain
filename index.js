@@ -25,6 +25,7 @@ app.post('/', (req, res) => {
   const accessToken = storage.getItem('accessToken')
   const accessTokenSecret = storage.getItem('accessTokenSecret')
 
+  console.log(accessToken)
   if (accessToken && accessTokenSecret) {
     twitter.search(
       {
@@ -41,7 +42,7 @@ app.post('/', (req, res) => {
           twitter.statuses(
             'update',
             {
-              status: 'ney'//'@horse_js @' + data.statuses[0].user.screen_name + ' https://twitter.com/' + data.statuses[0].user.screen_name + '/status/' + data.statuses[0].id_str,
+              status: 'ney' + data.statuses[0].id_str//'@horse_js @' + data.statuses[0].user.screen_name + ' https://twitter.com/' + data.statuses[0].user.screen_name + '/status/' + data.statuses[0].id_str,
               //in_reply_to_status_id: twitterId
             },
             accessToken,
