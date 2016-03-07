@@ -51,7 +51,7 @@ app.post('/', (req, res) => {
             console.log(error)
           }
           else {
-            console.log(tweet.text)
+            console.log(tweet)
             twitter.search(
               {
                 q: tweet.text,
