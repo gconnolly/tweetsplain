@@ -28,6 +28,10 @@ const bodyParser = require('body-parser')
 
 app.use(bodyParser.json())
 
+// request body:
+// id
+// text
+// username
 app.post('/', (req, res) => {
   const twitterId = twitterParse(req.body.link).id
   client.hgetall('access', (error, access) => {
@@ -49,7 +53,7 @@ app.post('/', (req, res) => {
             twitter.statuses(
               'update',
               {
-                status: '@horse_js @' + data.statuses[0].user.screen_name + ' https://twitter.com/' + data.statuses[0].user.screen_name + '/status/' + data.statuses[0].id_str,
+                status: '@' + req.body.username + ' @' + data.statuses[0].user.screen_name + ' https://twitter.com/' + data.statuses[0].user.screen_name + '/status/' + data.statuses[0].id_str,
                 in_reply_to_status_id: twitterId
               },
               access.token,
