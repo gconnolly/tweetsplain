@@ -69,8 +69,8 @@ app.post('/', (req, res) => {
                   twitter.statuses(
                     'update',
                     {
-                      status: 'ney' + data.statuses[0].id_str//'@' + req.body.username + ' @' + data.statuses[0].user.screen_name + ' https://twitter.com/' + data.statuses[0].user.screen_name + '/status/' + data.statuses[0].id_str,
-                      //in_reply_to_status_id: twitterId
+                      status: '@' + req.body.username + ' @' + data.statuses[0].user.screen_name + ' https://twitter.com/' + data.statuses[0].user.screen_name + '/status/' + data.statuses[0].id_str,
+                      in_reply_to_status_id: twitterId
                     },
                     access.token,
                     access.tokenSecret,
