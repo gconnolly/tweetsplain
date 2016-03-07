@@ -38,23 +38,22 @@ app.post('/', (req, res) => {
     if (error) {
       console.log(error)
     } else if (access) {
-      twitter.search(
+      twitter.statuses(
+        'show',
         {
-          q: req.body.text,
-          max_id: bigInt(twitterId).minus(1).toString()
+          id: twitterId
         },
         access.token,
         access.tokenSecret,
-        (error, data, response) => {
+        (error, data, tweet) => {
           if (error) {
             console.log(error)
           }
-          else if (data && data.statuses && data.statuses[0]) {
-            twitter.statuses(
-              'update',
+          else {
+            twitter.search(
               {
-                status: '@' + req.body.username + ' @' + data.statuses[0].user.screen_name + ' https://twitter.com/' + data.statuses[0].user.screen_name + '/status/' + data.statuses[0].id_str,
-                in_reply_to_status_id: twitterId
+                q: tweet.text,
+                max_id: bigInt(twitterId).minus(1).toString()
               },
               access.token,
               access.tokenSecret,
@@ -62,10 +61,27 @@ app.post('/', (req, res) => {
                 if (error) {
                   console.log(error)
                 }
+                else if (data && data.statuses && data.statuses[0]) {
+                  twitter.statuses(
+                    'update',
+                    {
+                      status: '@' + req.body.username + ' @' + data.statuses[0].user.screen_name + ' https://twitter.com/' + data.statuses[0].user.screen_name + '/status/' + data.statuses[0].id_str,
+                      in_reply_to_status_id: twitterId
+                    },
+                    access.token,
+                    access.tokenSecret,
+                    (error, data, response) => {
+                      if (error) {
+                        console.log(error)
+                      }
+                    }
+                  )
+                }
               }
             )
           }
-        })
+        }
+      )
     }
   })
   res.end()
