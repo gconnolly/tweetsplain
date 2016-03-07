@@ -46,12 +46,12 @@ app.post('/', (req, res) => {
         },
         access.token,
         access.tokenSecret,
-        (error, data, tweet) => {
+        (error, tweet, showResponse) => {
           if (error) {
             console.log(error)
           }
           else {
-            console.log(tweet)
+            console.log(tweet.text)
             twitter.search(
               {
                 q: tweet.text,
