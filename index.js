@@ -38,6 +38,7 @@ app.post('/', (req, res) => {
     if (error) {
       console.log(error)
     } else if (access) {
+      console.log(twitterId)
       twitter.statuses(
         'show',
         {
@@ -50,6 +51,7 @@ app.post('/', (req, res) => {
             console.log(error)
           }
           else {
+            console.log(tweet.text)
             twitter.search(
               {
                 q: tweet.text,
@@ -62,6 +64,8 @@ app.post('/', (req, res) => {
                   console.log(error)
                 }
                 else if (data && data.statuses && data.statuses[0]) {
+                  console.log(data.statuses[0].id_str)
+                  console.log(data.statuses[0].user.screen_name)
                   twitter.statuses(
                     'update',
                     {
