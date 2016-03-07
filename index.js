@@ -26,17 +26,13 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 
-app.use(bodyParser.text())
+app.use(bodyParser.json())
 
 // request body:
 // id
 // text
 // username
 app.post('/', (req, res) => {
-  console.log(req.body)
-  res.end()
-  return
-
   const twitterId = twitterParse(req.body.link).id
   client.hgetall('access', (error, access) => {
     if (error) {
