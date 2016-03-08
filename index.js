@@ -61,23 +61,26 @@ app.post('/', (req, res) => {
               (error, data, response) => {
                 if (error) {
                   console.log(error)
-                } else if (data && data.statuses && data.statuses[0]) {
-                  console.log(data.statuses[0].id_str)
-                  console.log(data.statuses[0].user.screen_name)
-                  twitter.statuses(
-                    'update',
-                    {
-                      status: '@' + req.body.username + ' @' + data.statuses[0].user.screen_name + ' https://twitter.com/' + data.statuses[0].user.screen_name + '/status/' + data.statuses[0].id_str,
-                      in_reply_to_status_id: twitterId
-                    },
-                    access.token,
-                    access.tokenSecret,
-                    (error, data, response) => {
-                      if (error) {
-                        console.log(error)
+                } else if (data && data.statuses) {
+                  const tweet = data.statuses.find((status) => !status.retweeted_status)
+                  if (tweet) {
+                    console.log(tweet.id_str)
+                    console.log(tweet.user.screen_name)
+                    /* twitter.statuses(
+                      'update',
+                      {
+                        status: '@' + req.body.username + ' @' + tweet.user.screen_name + ' https://twitter.com/' + tweet.user.screen_name + '/status/' + tweet.id_str,
+                        in_reply_to_status_id: twitterId
+                      },
+                      access.token,
+                      access.tokenSecret,
+                      (error, data, response) => {
+                        if (error) {
+                          console.log(error)
+                        }
                       }
-                    }
-                  )
+                    )*/
+                  }
                 }
               }
             )
