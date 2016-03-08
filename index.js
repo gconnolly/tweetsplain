@@ -66,7 +66,7 @@ app.post('/', (req, res) => {
                   if (tweet) {
                     console.log(tweet.id_str)
                     console.log(tweet.user.screen_name)
-                    /* twitter.statuses(
+                    twitter.statuses(
                       'update',
                       {
                         status: '@' + req.body.username + ' @' + tweet.user.screen_name + ' https://twitter.com/' + tweet.user.screen_name + '/status/' + tweet.id_str,
@@ -79,7 +79,7 @@ app.post('/', (req, res) => {
                           console.log(error)
                         }
                       }
-                    )*/
+                    )
                   }
                 }
               }
