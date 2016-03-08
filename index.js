@@ -49,8 +49,7 @@ app.post('/', (req, res) => {
         (error, tweet, showResponse) => {
           if (error) {
             console.log(error)
-          }
-          else {
+          } else {
             console.log(tweet.text)
             twitter.search(
               {
@@ -62,8 +61,7 @@ app.post('/', (req, res) => {
               (error, data, response) => {
                 if (error) {
                   console.log(error)
-                }
-                else if (data && data.statuses && data.statuses[0]) {
+                } else if (data && data.statuses && data.statuses[0]) {
                   console.log(data.statuses[0].id_str)
                   console.log(data.statuses[0].user.screen_name)
                   twitter.statuses(
@@ -104,7 +102,6 @@ app.get('/authenticate', (req, res) => {
           res.redirect(twitter.getAuthUrl(requestToken))
         }
       })
-
     }
   })
 })
