@@ -21,6 +21,9 @@ client.on('error', (error) => {
   console.log(error)
 })
 
+// request-json
+const request = require('request-json')
+
 // express
 const express = require('express')
 const app = express()
@@ -62,14 +65,14 @@ app.post('/', (req, res) => {
                 if (error) {
                   console.log(error)
                 } else if (data && data.statuses) {
-                  const tweet = data.statuses.find((status) => !status.retweeted_status)
-                  if (tweet) {
-                    console.log(tweet.id_str)
-                    console.log(tweet.user.screen_name)
+                  const sourceTweet = data.statuses.find((status) => !status.retweeted_status)
+                  if (sourceTweet) {
+                    console.log(sourceTweet.id_str)
+                    console.log(sourceTweet.user.screen_name)
                     twitter.statuses(
                       'update',
                       {
-                        status: '@' + req.body.username + ' @' + tweet.user.screen_name + ' https://twitter.com/' + tweet.user.screen_name + '/status/' + tweet.id_str,
+                        status: '@' + req.body.username + ' @' + sourceTweet.user.screen_name + ' https://twitter.com/' + sourceTweet.user.screen_name + '/status/' + sourceTweet.id_str,
                         in_reply_to_status_id: twitterId
                       },
                       access.token,
@@ -77,6 +80,40 @@ app.post('/', (req, res) => {
                       (error, data, response) => {
                         if (error) {
                           console.log(error)
+                        }
+                      }
+                    )
+                  } else {
+                    console.log('no matching tweet')
+                    request.post(
+                      'process.env.ALGOLIA_URL',
+                      {
+                        params: 'query=' + encodeURIComponent(tweet.text)
+                      },
+                      (error, response, body) => {
+                        if (error) {
+                          console.log(error)
+                        } else {
+                          if (body && body.hits && body.hits[0]) {
+                            console.log('@' + req.body.username + ' https://hn.algolia.com/?query=' + encodeURIComponent(tweet.text) + '&type=all ' + body.hits[0].story_url)
+
+                            /* twitter.statuses(
+                              'update',
+                              {
+                                status: '@' + req.body.username + ' https://hn.algolia.com/?query=' + encodeURIComponent(tweet.text) + '&type=all ' + body.hits[0].story_url,
+                                in_reply_to_status_id: twitterId
+                              },
+                              access.token,
+                              access.tokenSecret,
+                              (error, data, response) => {
+                                if (error) {
+                                  console.log(error)
+                                }
+                              }
+                            ) */
+                          } else {
+                            console.log('no matching comment')
+                          }
                         }
                       }
                     )
