@@ -22,7 +22,7 @@ client.on('error', (error) => {
 })
 
 // request-json
-const request = require('request-json')
+const request = require('request')
 
 // express
 const express = require('express')
@@ -85,10 +85,13 @@ app.post('/', (req, res) => {
                     )
                   } else {
                     console.log('no matching tweet')
-                    request.post(
-                      'process.env.ALGOLIA_URL',
+                    request(
                       {
-                        params: 'query=' + encodeURIComponent(tweet.text)
+                        uri: process.env.ALGOLIA_URL,
+                        method: 'POST',
+                        json: {
+                          'params': 'query=' + encodeURIComponent(tweet.text)
+                        }
                       },
                       (error, response, body) => {
                         if (error) {
