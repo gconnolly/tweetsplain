@@ -100,7 +100,7 @@ app.post('/', (req, res) => {
                           if (body && body.hits && body.hits[0]) {
                             console.log('@' + req.body.username + ' https://hn.algolia.com/?query=' + encodeURIComponent(tweet.text) + '&type=all ' + body.hits[0].story_url)
 
-                            /* twitter.statuses(
+                            twitter.statuses(
                               'update',
                               {
                                 status: '@' + req.body.username + ' https://hn.algolia.com/?query=' + encodeURIComponent(tweet.text) + '&type=all ' + body.hits[0].story_url,
@@ -113,7 +113,7 @@ app.post('/', (req, res) => {
                                   console.log(error)
                                 }
                               }
-                            ) */
+                            )
                           } else {
                             console.log('no matching comment')
                           }
