@@ -65,7 +65,10 @@ app.post('/', (req, res) => {
                 if (error) {
                   console.log(error)
                 } else if (data && data.statuses) {
-                  const sourceTweet = data.statuses.find((status) => !status.retweeted_status)
+                  const sourceTweet = data.statuses[0].retweeted_status
+                    ? data.statuses[0].retweeted_status
+                    : data.statuses[0]
+
                   if (sourceTweet) {
                     console.log(sourceTweet.id_str)
                     console.log(sourceTweet.user.screen_name)
