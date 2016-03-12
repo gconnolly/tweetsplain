@@ -132,6 +132,83 @@ app.post('/', (req, res) => {
   res.end()
 })
 
+// request body:
+// id
+// text
+// username
+app.post('/test', (req, res) => {
+  const twitterId = twitterParse(req.body.link).id
+  client.hgetall('access', (error, access) => {
+    if (error) {
+      console.log(error)
+      res.end()
+    } else if (access) {
+      console.log(twitterId)
+      twitter.statuses(
+        'show',
+        {
+          id: twitterId
+        },
+        access.token,
+        access.tokenSecret,
+        (error, tweet, showResponse) => {
+          if (error) {
+            console.log(error)
+            res.end()
+          } else {
+            console.log(tweet.text)
+            twitter.search(
+              {
+                q: tweet.text,
+                max_id: bigInt(twitterId).minus(1).toString()
+              },
+              access.token,
+              access.tokenSecret,
+              (error, data, response) => {
+                if (error) {
+                  console.log(error)
+                  res.end()
+                } else if (data && data.statuses) {
+                  const sourceTweet = data.statuses.find((status) => !status.retweeted_status)
+                  if (sourceTweet) {
+                    console.log('@' + req.body.username + ' @' + sourceTweet.user.screen_name + ' https://twitter.com/' + sourceTweet.user.screen_name + '/status/' + sourceTweet.id_str)
+                    res.send('@' + req.body.username + ' @' + sourceTweet.user.screen_name + ' https://twitter.com/' + sourceTweet.user.screen_name + '/status/' + sourceTweet.id_str)
+                  } else {
+                    console.log('no matching tweet')
+                    request(
+                      {
+                        uri: process.env.ALGOLIA_URL,
+                        method: 'POST',
+                        json: {
+                          'params': 'query=' + encodeURIComponent(tweet.text)
+                        }
+                      },
+                      (error, response, body) => {
+                        if (error) {
+                          console.log(error)
+                          res.end()
+                        } else {
+                          if (body && body.hits && body.hits[0]) {
+                            console.log('@' + req.body.username + ' https://hn.algolia.com/?query=' + encodeURIComponent(tweet.text) + '&type=all ' + body.hits[0].story_url)
+                            res.send('@' + req.body.username + ' https://hn.algolia.com/?query=' + encodeURIComponent(tweet.text) + '&type=all ' + body.hits[0].story_url)
+                          } else {
+                            console.log('no matching comment')
+                            res.end()
+                          }
+                        }
+                      }
+                    )
+                  }
+                }
+              }
+            )
+          }
+        }
+      )
+    }
+  })
+})
+
 app.get('/authenticate', (req, res) => {
   twitter.getRequestToken((error, requestToken, requestTokenSecret, results) => {
     if (error) {
