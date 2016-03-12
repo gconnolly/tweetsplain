@@ -170,7 +170,10 @@ app.post('/test', (req, res) => {
                   res.end()
                 } else if (data && data.statuses) {
                   console.log(data.statuses)
-                  const sourceTweet = data.statuses[0] // .find((status) => !status.retweeted_status)
+                  const sourceTweet = data.statuses[0].retweeted_status
+                    ? data.statuses[0].retweeted_status
+                    : data.statuses[0]
+
                   if (sourceTweet) {
                     console.log('@' + req.body.username + ' @' + sourceTweet.user.screen_name + ' https://twitter.com/' + sourceTweet.user.screen_name + '/status/' + sourceTweet.id_str)
                     res.send('@' + req.body.username + ' @' + sourceTweet.user.screen_name + ' https://twitter.com/' + sourceTweet.user.screen_name + '/status/' + sourceTweet.id_str)
