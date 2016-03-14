@@ -36,110 +36,14 @@ app.use(bodyParser.json())
 // text
 // username
 app.post('/', (req, res) => {
-  const twitterId = twitterParse(req.body.link).id
-  client.hgetall('access', (error, access) => {
-    if (error) {
-      console.log(error)
-    } else if (access) {
-      console.log(twitterId)
-      twitter.statuses(
-        'show',
-        {
-          id: twitterId
-        },
-        access.token,
-        access.tokenSecret,
-        (error, tweet, showResponse) => {
-          if (error) {
-            console.log(error)
-          } else {
-            console.log(tweet.text)
-            twitter.search(
-              {
-                q: tweet.text,
-                max_id: bigInt(twitterId).minus(1).toString()
-              },
-              access.token,
-              access.tokenSecret,
-              (error, data, response) => {
-                if (error) {
-                  console.log(error)
-                } else if (data && data.statuses) {
-                  const sourceTweet = data.statuses[0].retweeted_status
-                    ? data.statuses[0].retweeted_status
-                    : data.statuses[0]
-
-                  if (sourceTweet) {
-                    console.log(sourceTweet.id_str)
-                    console.log(sourceTweet.user.screen_name)
-                    twitter.statuses(
-                      'update',
-                      {
-                        status: '@' + req.body.username + ' @' + sourceTweet.user.screen_name + ' https://twitter.com/' + sourceTweet.user.screen_name + '/status/' + sourceTweet.id_str,
-                        in_reply_to_status_id: twitterId
-                      },
-                      access.token,
-                      access.tokenSecret,
-                      (error, data, response) => {
-                        if (error) {
-                          console.log(error)
-                        }
-                      }
-                    )
-                  } else {
-                    console.log('no matching tweet')
-                    request(
-                      {
-                        uri: process.env.ALGOLIA_URL,
-                        method: 'POST',
-                        json: {
-                          'params': 'query=' + encodeURIComponent(tweet.text)
-                        }
-                      },
-                      (error, response, body) => {
-                        if (error) {
-                          console.log(error)
-                        } else {
-                          if (body && body.hits && body.hits[0]) {
-                            console.log('@' + req.body.username + ' https://hn.algolia.com/?query=' + encodeURIComponent(tweet.text) + '&type=all ' + body.hits[0].story_url)
-
-                            twitter.statuses(
-                              'update',
-                              {
-                                status: '@' + req.body.username + ' https://hn.algolia.com/?query=' + encodeURIComponent(tweet.text) + '&type=all ' + body.hits[0].story_url,
-                                in_reply_to_status_id: twitterId
-                              },
-                              access.token,
-                              access.tokenSecret,
-                              (error, data, response) => {
-                                if (error) {
-                                  console.log(error)
-                                }
-                              }
-                            )
-                          } else {
-                            console.log('no matching comment')
-                          }
-                        }
-                      }
-                    )
-                  }
-                }
-              }
-            )
-          }
-        }
-      )
-    }
-  })
-  res.end()
+  tweetsplain(req, res, true)
 })
 
-// request body:
-// id
-// text
-// username
 app.post('/test', (req, res) => {
+  tweetsplain(req, res, false)
+})
+
+function tweetsplain (req, res, tweetTheResult) {
   const twitterId = twitterParse(req.body.link).id
   client.hgetall('access', (error, access) => {
     if (error) {
@@ -172,7 +76,6 @@ app.post('/test', (req, res) => {
                   console.log(error)
                   res.end()
                 } else if (data && data.statuses) {
-                  console.log(data.statuses)
                   const sourceTweet = data.statuses[0].retweeted_status
                     ? data.statuses[0].retweeted_status
                     : data.statuses[0]
@@ -180,6 +83,22 @@ app.post('/test', (req, res) => {
                   if (sourceTweet) {
                     console.log('@' + req.body.username + ' @' + sourceTweet.user.screen_name + ' https://twitter.com/' + sourceTweet.user.screen_name + '/status/' + sourceTweet.id_str)
                     res.send('@' + req.body.username + ' @' + sourceTweet.user.screen_name + ' https://twitter.com/' + sourceTweet.user.screen_name + '/status/' + sourceTweet.id_str)
+                    if (tweetTheResult) {
+                      twitter.statuses(
+                        'update',
+                        {
+                          status: '@' + req.body.username + ' @' + sourceTweet.user.screen_name + ' https://twitter.com/' + sourceTweet.user.screen_name + '/status/' + sourceTweet.id_str,
+                          in_reply_to_status_id: twitterId
+                        },
+                        access.token,
+                        access.tokenSecret,
+                        (error, data, response) => {
+                          if (error) {
+                            console.log(error)
+                          }
+                        }
+                      )
+                    }
                   } else {
                     console.log('no matching tweet')
                     request(
@@ -198,6 +117,22 @@ app.post('/test', (req, res) => {
                           if (body && body.hits && body.hits[0]) {
                             console.log('@' + req.body.username + ' https://hn.algolia.com/?query=' + encodeURIComponent(tweet.text) + '&type=all ' + body.hits[0].story_url)
                             res.send('@' + req.body.username + ' https://hn.algolia.com/?query=' + encodeURIComponent(tweet.text) + '&type=all ' + body.hits[0].story_url)
+                            if (tweetTheResult) {
+                              twitter.statuses(
+                                'update',
+                                {
+                                  status: '@' + req.body.username + ' https://hn.algolia.com/?query=' + encodeURIComponent(tweet.text) + '&type=all ' + body.hits[0].story_url,
+                                  in_reply_to_status_id: twitterId
+                                },
+                                access.token,
+                                access.tokenSecret,
+                                (error, data, response) => {
+                                  if (error) {
+                                    console.log(error)
+                                  }
+                                }
+                              )
+                            }
                           } else {
                             console.log('no matching comment')
                             res.end()
@@ -214,7 +149,7 @@ app.post('/test', (req, res) => {
       )
     }
   })
-})
+}
 
 app.get('/authenticate', (req, res) => {
   twitter.getRequestToken((error, requestToken, requestTokenSecret, results) => {
