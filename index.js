@@ -75,7 +75,7 @@ function tweetsplain (req, res, tweetTheResult) {
                 if (error) {
                   console.log(error)
                   res.end()
-                } else if (data && data.statuses) {
+                } else if (data && data.statuses && data.statuses.length) {
                   const sourceTweet = data.statuses[0].retweeted_status
                     ? data.statuses[0].retweeted_status
                     : data.statuses[0]
