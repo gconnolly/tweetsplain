@@ -108,7 +108,7 @@ function tweetsplain (req, res, tweetTheResult) {
                         uri: process.env.ALGOLIA_URL,
                         method: 'POST',
                         json: {
-                          'params': 'query=' + encodeURIComponent(tweet.text)
+                          'params': 'query=' + encodeURIComponent('"' + tweet.text + '"')
                         }
                       },
                       (error, response, body) => {
