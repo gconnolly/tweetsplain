@@ -66,7 +66,7 @@ function tweetsplain (req, res, tweetTheResult) {
             console.log(tweet.text)
             twitter.search(
               {
-                q: tweet.text,
+                q: tweet.text.replaceAll('(', '%28').replaceAll(')', '%29'),
                 max_id: bigInt(twitterId).minus(1).toString()
               },
               access.token,
