@@ -66,7 +66,7 @@ function tweetsplain (req, res, tweetTheResult) {
             console.log(tweet.text)
             twitter.search(
               {
-                q: encodeURIComponent(tweet.text),
+                q: tweet.text.substring(0, 100),
                 max_id: bigInt(twitterId).minus(1).toString()
               },
               access.token,
