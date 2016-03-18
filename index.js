@@ -117,13 +117,13 @@ function tweetsplain (req, res, tweetTheResult) {
                           res.end()
                         } else {
                           if (body && body.hits && body.hits[0]) {
-                            console.log('@' + req.body.username + ' https://hn.algolia.com/?query=%22' + encodeURIComponent(tweet.text) + '%22&type=all ' + body.hits[0].story_url)
-                            res.send('@' + req.body.username + ' https://hn.algolia.com/?query=%22' + encodeURIComponent(tweet.text) + '%22&type=all ' + body.hits[0].story_url)
+                            console.log('@' + req.body.username + ' https://hn.algolia.com/?query=' + encodeURIComponent(tweet.text) + '&type=all ' + body.hits[0].story_url)
+                            res.send('@' + req.body.username + ' https://hn.algolia.com/?query=' + encodeURIComponent(tweet.text) + '&type=all ' + body.hits[0].story_url)
                             if (tweetTheResult) {
                               twitter.statuses(
                                 'update',
                                 {
-                                  status: '@' + req.body.username + ' https://hn.algolia.com/?query=%22' + encodeURIComponent(tweet.text) + '%22&type=all ' + body.hits[0].story_url,
+                                  status: '@' + req.body.username + ' https://hn.algolia.com/?query=' + encodeURIComponent(tweet.text) + '&type=all ' + body.hits[0].story_url,
                                   in_reply_to_status_id: twitterId
                                 },
                                 access.token,
