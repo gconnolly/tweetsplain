@@ -64,9 +64,13 @@ function tweetsplain (req, res, tweetTheResult) {
             res.end()
           } else {
             console.log(tweet.text)
+            var tweetText = tweet.text.replace('(', '%28').replace(')', '%29')
+            if (tweetText[0] === '.') {
+              tweetText = tweetText.slice(1)
+            }
             twitter.search(
               {
-                q: '"' + tweet.text.replace('-', '%2D').replace(':', '%3A').replace('@', '%40').replace('.', '%2E').replace('(', '%28').replace(')', '%29') + '"',
+                q: '"' + tweetText + '"',
                 max_id: bigInt(twitterId).minus(1).toString()
               },
               access.token,
