@@ -158,8 +158,6 @@ function tweetsplain (req, res, tweetTheResult) {
                                   console.log(error)
                                   res.end()
                                 } else {
-                                  console.log(response)
-                                  console.log(body)
                                   if (body && body.items && body.items[0]) {
                                     console.log('@' + req.body.username + ' ' + body.items[0].link)
                                     res.send('@' + req.body.username + ' ' + body.items[0].link)
