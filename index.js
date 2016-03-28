@@ -140,8 +140,49 @@ function tweetsplain (req, res, tweetTheResult) {
                               )
                             }
                           } else {
-                            console.log('no matching comment')
-                            res.end()
+                            console.log('no matching hn comment')
+                            request(
+                              {
+                                url: 'https://www.googleapis.com/customsearch/v1',
+                                method: 'GET',
+                                qs: {
+                                  q: tweet.text,
+                                  exactTerms: tweet.text,
+                                  cx: process.env.GOOGLE_CUSTOM_ENGINE_ID,
+                                  key: process.env.GOOGLE_API_KEY
+                                }
+                              },
+                              (error, response, body) => {
+                                if (error) {
+                                  console.log(error)
+                                  res.end()
+                                } else {
+                                  if (body && body.items && body.items[0]) {
+                                    console.log('@' + req.body.username + ' ' + body.items[0].link)
+                                    res.send('@' + req.body.username + ' ' + body.items[0].link)
+                                    if (tweetTheResult) {
+                                      twitter.statuses(
+                                        'update',
+                                        {
+                                          status: '@' + req.body.username + ' ' + body.items[0].link,
+                                          in_reply_to_status_id: twitterId
+                                        },
+                                        access.token,
+                                        access.tokenSecret,
+                                        (error, data, response) => {
+                                          if (error) {
+                                            console.log(error)
+                                          }
+                                        }
+                                      )
+                                    }
+                                  } else {
+                                    console.log('no matching meduim')
+                                    res.end()
+                                  }
+                                }
+                              }
+                            )
                           }
                         }
                       }
