@@ -150,7 +150,8 @@ function tweetsplain (req, res, tweetTheResult) {
                                   exactTerms: tweet.text,
                                   cx: process.env.GOOGLE_CUSTOM_ENGINE_ID,
                                   key: process.env.GOOGLE_API_KEY
-                                }
+                                },
+                                json: true
                               },
                               (error, response, body) => {
                                 if (error) {
