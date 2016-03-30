@@ -164,6 +164,9 @@ function tweetsplain (req, res, tweetTheResult) {
                 }
               }
             )
+          } else if (tweet) {
+            console.log(tweet)
+            res.send(tweet)
           } else {
             console.log('no matching tweet')
             res.send('no matching tweet')
