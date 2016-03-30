@@ -45,156 +45,134 @@ app.post('/test', (req, res) => {
 
 function tweetsplain (req, res, tweetTheResult) {
   const twitterId = twitterParse(req.body.link).id
+
   client.hgetall('access', (error, access) => {
     if (error) {
       console.log(error)
       res.end()
     } else if (access) {
-      console.log(twitterId)
-      twitter.statuses(
-        'show',
-        {
-          id: twitterId
-        },
-        access.token,
-        access.tokenSecret,
-        (error, tweet, showResponse) => {
-          if (error) {
-            console.log(error)
-            res.end()
-          } else {
-            console.log(tweet.text)
-            var tweetText = tweet.text.replace('(', '%28').replace(')', '%29')
-            if (tweetText[0] === '.') {
-              tweetText = tweetText.slice(1)
+      const findSource = new Promise((resolve, reject) => {
+        console.log(twitterId)
+        twitter.statuses(
+          'show',
+          {
+            id: twitterId
+          },
+          access.token,
+          access.tokenSecret,
+          (error, tweet, showResponse) => {
+            if (error) {
+              reject(error)
+            } else {
+              console.log(tweet.text)
+              var tweetText = tweet.text.replace('(', '%28').replace(')', '%29')
+              if (tweetText[0] === '.') {
+                tweetText = tweetText.slice(1)
+              }
+              twitter.search(
+                {
+                  q: '"' + tweetText + '"',
+                  max_id: bigInt(twitterId).minus(1).toString()
+                },
+                access.token,
+                access.tokenSecret,
+                (error, data, response) => {
+                  if (error) {
+                    reject(error)
+                  } else {
+                    const sourceTweet = data && data.statuses && data.statuses[0]
+                      ? data.statuses[0].retweeted_status
+                        ? data.statuses[0].retweeted_status
+                        : data.statuses[0]
+                      : undefined
+
+                    if (sourceTweet) {
+                      resolve('@' + req.body.username + ' @' + sourceTweet.user.screen_name + ' https://twitter.com/' + sourceTweet.user.screen_name + '/status/' + sourceTweet.id_str)
+                    } else {
+                      console.log('no matching tweet')
+                      request(
+                        {
+                          uri: process.env.ALGOLIA_URL,
+                          method: 'POST',
+                          json: {
+                            'params': 'query=%22' + encodeURIComponent(tweet.text) + '%22'
+                          }
+                        },
+                        (error, response, body) => {
+                          if (error) {
+                            reject(error)
+                          } else {
+                            if (body && body.hits && body.hits[0]) {
+                              resolve('@' + req.body.username + ' https://hn.algolia.com/?query=' + encodeURIComponent(tweet.text) + '&type=all ' + body.hits[0].story_url)
+                            } else {
+                              console.log('no matching hn comment')
+                              request(
+                                {
+                                  url: 'https://www.googleapis.com/customsearch/v1',
+                                  method: 'GET',
+                                  qs: {
+                                    q: tweet.text,
+                                    exactTerms: tweet.text,
+                                    cx: process.env.GOOGLE_CUSTOM_ENGINE_ID,
+                                    key: process.env.GOOGLE_API_KEY
+                                  },
+                                  json: true
+                                },
+                                (error, response, body) => {
+                                  if (error) {
+                                    reject(error)
+                                  } else {
+                                    if (body && body.items && body.items[0]) {
+                                      resolve('@' + req.body.username + ' ' + body.items[0].link)
+                                    } else {
+                                      resolve()
+                                    }
+                                  }
+                                }
+                              )
+                            }
+                          }
+                        }
+                      )
+                    }
+                  }
+                }
+              )
             }
-            twitter.search(
+          }
+        )
+      })
+
+      findSource
+        .then((tweet) => {
+          if (tweet && tweetTheResult) {
+            twitter.statuses(
+              'update',
               {
-                q: '"' + tweetText + '"',
-                max_id: bigInt(twitterId).minus(1).toString()
+                status: tweet,
+                in_reply_to_status_id: twitterId
               },
               access.token,
               access.tokenSecret,
               (error, data, response) => {
                 if (error) {
                   console.log(error)
-                  res.end()
+                  res.status(500).end()
                 } else {
-                  const sourceTweet = data && data.statuses && data.statuses[0]
-                    ? data.statuses[0].retweeted_status
-                      ? data.statuses[0].retweeted_status
-                      : data.statuses[0]
-                    : undefined
-
-                  if (sourceTweet) {
-                    console.log('@' + req.body.username + ' @' + sourceTweet.user.screen_name + ' https://twitter.com/' + sourceTweet.user.screen_name + '/status/' + sourceTweet.id_str)
-                    res.send('@' + req.body.username + ' @' + sourceTweet.user.screen_name + ' https://twitter.com/' + sourceTweet.user.screen_name + '/status/' + sourceTweet.id_str)
-                    if (tweetTheResult) {
-                      twitter.statuses(
-                        'update',
-                        {
-                          status: '@' + req.body.username + ' @' + sourceTweet.user.screen_name + ' https://twitter.com/' + sourceTweet.user.screen_name + '/status/' + sourceTweet.id_str,
-                          in_reply_to_status_id: twitterId
-                        },
-                        access.token,
-                        access.tokenSecret,
-                        (error, data, response) => {
-                          if (error) {
-                            console.log(error)
-                          }
-                        }
-                      )
-                    }
-                  } else {
-                    console.log('no matching tweet')
-                    request(
-                      {
-                        uri: process.env.ALGOLIA_URL,
-                        method: 'POST',
-                        json: {
-                          'params': 'query=%22' + encodeURIComponent(tweet.text) + '%22'
-                        }
-                      },
-                      (error, response, body) => {
-                        if (error) {
-                          console.log(error)
-                          res.end()
-                        } else {
-                          if (body && body.hits && body.hits[0]) {
-                            console.log('@' + req.body.username + ' https://hn.algolia.com/?query=' + encodeURIComponent(tweet.text) + '&type=all ' + body.hits[0].story_url)
-                            res.send('@' + req.body.username + ' https://hn.algolia.com/?query=' + encodeURIComponent(tweet.text) + '&type=all ' + body.hits[0].story_url)
-                            if (tweetTheResult) {
-                              twitter.statuses(
-                                'update',
-                                {
-                                  status: '@' + req.body.username + ' https://hn.algolia.com/?query=' + encodeURIComponent(tweet.text) + '&type=all ' + body.hits[0].story_url,
-                                  in_reply_to_status_id: twitterId
-                                },
-                                access.token,
-                                access.tokenSecret,
-                                (error, data, response) => {
-                                  if (error) {
-                                    console.log(error)
-                                  }
-                                }
-                              )
-                            }
-                          } else {
-                            console.log('no matching hn comment')
-                            request(
-                              {
-                                url: 'https://www.googleapis.com/customsearch/v1',
-                                method: 'GET',
-                                qs: {
-                                  q: tweet.text,
-                                  exactTerms: tweet.text,
-                                  cx: process.env.GOOGLE_CUSTOM_ENGINE_ID,
-                                  key: process.env.GOOGLE_API_KEY
-                                },
-                                json: true
-                              },
-                              (error, response, body) => {
-                                if (error) {
-                                  console.log(error)
-                                  res.end()
-                                } else {
-                                  if (body && body.items && body.items[0]) {
-                                    console.log('@' + req.body.username + ' ' + body.items[0].link)
-                                    res.send('@' + req.body.username + ' ' + body.items[0].link)
-                                    if (tweetTheResult) {
-                                      twitter.statuses(
-                                        'update',
-                                        {
-                                          status: '@' + req.body.username + ' ' + body.items[0].link,
-                                          in_reply_to_status_id: twitterId
-                                        },
-                                        access.token,
-                                        access.tokenSecret,
-                                        (error, data, response) => {
-                                          if (error) {
-                                            console.log(error)
-                                          }
-                                        }
-                                      )
-                                    }
-                                  } else {
-                                    console.log('no matching meduim')
-                                    res.end()
-                                  }
-                                }
-                              }
-                            )
-                          }
-                        }
-                      }
-                    )
-                  }
+                  console.log(tweet)
+                  res.send(tweet)
                 }
               }
             )
+          } else {
+            console.log('no matching tweet')
+            res.send('no matching tweet')
           }
-        }
-      )
+        })
+        .catch((error) => {
+          console.log(error)
+          res.status(500).end()
+        })
     }
   })
 }
