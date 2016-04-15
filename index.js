@@ -95,7 +95,7 @@ function tweetsplain (req, res, tweetTheResult) {
                           uri: process.env.ALGOLIA_URL,
                           method: 'POST',
                           json: {
-                            'params': 'query=%22' + encodeURIComponent(tweet.text) + '&numericFilters=%5B%22created_at_i%3E' + new Date().setMonth(new Date().getMonth() - 1) + '%22%5D'
+                            'params': 'query=%22' + encodeURIComponent(tweet.text) + '&sort=byDate'
                           }
                         },
                         (error, response, body) => {
@@ -103,7 +103,7 @@ function tweetsplain (req, res, tweetTheResult) {
                             reject(error)
                           } else {
                             if (body && body.hits && body.hits[0]) {
-                              resolve('@' + req.body.username + ' https://hn.algolia.com/?query=' + encodeURIComponent(tweet.text) + '&type=all&dateRange=pastMonth ' + body.hits[0].story_url)
+                              resolve('@' + req.body.username + ' https://hn.algolia.com/?query=' + encodeURIComponent(tweet.text) + '&sort=byDate ' + body.hits[0].story_url)
                             } else {
                               console.log('no matching hn comment')
                               request(
