@@ -95,7 +95,7 @@ function tweetsplain (req, res, tweetTheResult) {
                           uri: process.env.ALGOLIA_URL,
                           method: 'POST',
                           json: {
-                            'params': 'query=%22' + encodeURIComponent(tweet.text) + '%22'
+                            'params': 'query=%22' + encodeURIComponent(tweet.text) + '%22&advancedSyntax=true&numericFilters=%5B%22created_at_i%3E1462366389.934%22%5D'
                           }
                         },
                         (error, response, body) => {
