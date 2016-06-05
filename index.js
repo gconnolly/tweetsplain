@@ -103,7 +103,7 @@ function tweetsplain (req, res, tweetTheResult) {
                             reject(error)
                           } else {
                             if (body && body.hits && body.hits[0]) {
-                              resolve('@' + req.body.username + ' https://hn.algolia.com/?query=' + encodeURIComponent(tweet.text) + '&type=all ' + body.hits[0].story_url)
+                              resolve('@' + req.body.username + ' https://hn.algolia.com/?query=%22' + encodeURIComponent(tweet.text) + '%22&dateRange=pastMonth&type=all ' + body.hits[0].story_url)
                             } else {
                               console.log('no matching hn comment')
                               request(
