@@ -13,10 +13,6 @@ const twitter = new twitterAPI({
   callback: process.env.TWITTER_OAUTH_CALLBACK || 'http://localhost:8080/oauth'
 })
 
-// redis
-const redis = require('redis')
-const client = redis.createClient(process.env.REDIS_URL)
-
 client.on('error', (error) => {
   console.log(error)
 })
@@ -232,6 +228,59 @@ app.get('/oauth', (req, res) => {
         })
     }
   })
+})
+
+app.post('/gnip', function(req, res) {
+  let tweetId = req.body.id;
+  client.hgetall('access', (error, access) => {
+    if (error) {
+      console.log(error)
+      res.end()
+    } else if (access) {
+      twitter.statuses(
+        'show',
+        {
+          id: tweetId
+        },
+        access.token,
+        access.tokenSecret,
+        (error, tweet) => {
+          if (error) {
+            reject(error)
+          } else {
+            console.log(tweet)
+            // request({
+            //   url: `https://gnip-api.twitter.com/search/fullarchive/accounts/${process.env.GNIP_ACCOUNT}/prod.json`,
+            //   headers: {
+            //     Authorization: `Basic ${process.env.GNIP_TOKEN}`
+            //   },
+            //   method: 'POST',
+            //   json: true,
+            //   body: {
+            //     query: tweet.text,
+            //     toDate: "201211021700"
+            //   }
+            // },
+            // (error, response, body) => {
+            //   if (error) {
+            //     reject(error)
+            //   } else {
+            //     if (body && body.results && body.results[0]) {
+            //       resolve('@' + req.body.username + ' ' + body.items[0].link)
+            //     } else {
+            //       resolve()
+            //     }
+            //   }
+            // })
+          }
+        }
+      )
+    }
+  })
+
+
+
+
 })
 
 app.listen(process.env.PORT || 8080, () => console.log('listening ' + (process.env.PORT || 8080)))
