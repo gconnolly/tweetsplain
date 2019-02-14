@@ -183,7 +183,7 @@ function tweetsplain (req, res, tweetTheResult) {
 app.get('/authenticate', (req, res) => {
   twitter.getRequestToken((error, requestToken, requestTokenSecret, results) => {
     if (error) {
-      console.log('Error getting OAuth request token : ' + error)
+      console.log('Error getting OAuth request token : ' + JSON.stringify(error))
     } else {
       client.del('request')
       client.hmset('request', 'token', requestToken, 'tokenSecret', requestTokenSecret, (error, result) => {
