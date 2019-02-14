@@ -3,6 +3,7 @@
 
 // other
 const bigInt = require('big-integer')
+const moment = require('moment')
 
 // twitter api
 const twitterParse = require('twitter-url-parser')
@@ -252,30 +253,30 @@ app.post('/gnip', function(req, res) {
           if (error) {
             reject(error)
           } else {
-            res.send(tweet)
-            // request({
-            //   url: `https://gnip-api.twitter.com/search/fullarchive/accounts/${process.env.GNIP_ACCOUNT}/prod.json`,
-            //   headers: {
-            //     Authorization: `Basic ${process.env.GNIP_TOKEN}`
-            //   },
-            //   method: 'POST',
-            //   json: true,
-            //   body: {
-            //     query: tweet.text,
-            //     toDate: "201211021700"
-            //   }
-            // },
-            // (error, response, body) => {
-            //   if (error) {
-            //     reject(error)
-            //   } else {
-            //     if (body && body.results && body.results[0]) {
-            //       resolve('@' + req.body.username + ' ' + body.items[0].link)
-            //     } else {
-            //       resolve()
-            //     }
-            //   }
-            // })
+            console.log(tweet)
+            request({
+              url: `https://gnip-api.twitter.com/search/fullarchive/accounts/${process.env.GNIP_ACCOUNT}/prod.json`,
+              headers: {
+                Authorization: `Basic ${process.env.GNIP_TOKEN}`
+              },
+              method: 'POST',
+              json: true,
+              body: {
+                query: tweet.text,
+                toDate: moment(tweet.created_at).format('YYYYMMDDhhmm')
+              }
+            },
+            (error, response, body) => {
+              if (error) {
+                reject(error)
+              } else {
+                if (body && body.results && body.results[0]) {
+                  res.send('@' + body.results[0].user.screen_name + ' ' + `https://twitter.com/${body.results[0].user.screen_name}/status/${body.results[0].id_str}`)
+                } else {
+                  res.send('FAIL')
+                }
+              }
+            })
           }
         }
       )
