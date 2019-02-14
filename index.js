@@ -252,7 +252,7 @@ app.post('/gnip', function(req, res) {
           if (error) {
             reject(error)
           } else {
-            console.log(tweet.text)
+            res.send(tweet)
             // request({
             //   url: `https://gnip-api.twitter.com/search/fullarchive/accounts/${process.env.GNIP_ACCOUNT}/prod.json`,
             //   headers: {
