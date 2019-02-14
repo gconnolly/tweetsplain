@@ -34,7 +34,7 @@ function getTweets(next){
         request(options, function (error, response, body) {
             if (error) reject(error);
             results = results.concat(body.results);
-            setTimeout(()=>{
+            setTimeout(()=>{ //Try to stay below the Gnip API limits
                 resolve(body);
             }, 500);
         });
@@ -42,7 +42,7 @@ function getTweets(next){
 }
 
 async function fetchAllTweets(next){
-    result = await getTweets(next);
+    let result = await getTweets(next);
 
     if(result.next){
         return await fetchAllTweets(result.next);
