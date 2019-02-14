@@ -13,6 +13,10 @@ const twitter = new twitterAPI({
   callback: process.env.TWITTER_OAUTH_CALLBACK || 'http://localhost:8080/oauth'
 })
 
+// redis
+const redis = require('redis')
+const client = redis.createClient(process.env.REDIS_URL)
+
 client.on('error', (error) => {
   console.log(error)
 })
@@ -248,7 +252,7 @@ app.post('/gnip', function(req, res) {
           if (error) {
             reject(error)
           } else {
-            console.log(tweet)
+            console.log(tweet.text)
             // request({
             //   url: `https://gnip-api.twitter.com/search/fullarchive/accounts/${process.env.GNIP_ACCOUNT}/prod.json`,
             //   headers: {
