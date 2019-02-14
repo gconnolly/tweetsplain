@@ -283,9 +283,34 @@ app.post('/gnip', function(req, res) {
     }
   })
 
+  app.post('/firehose', function(req, res) {
+    let tweetText = req.body.text;
+    let tweetTimestamp = req.body.created_at;
 
-
-
+    request({
+      url: `https://gnip-api.twitter.com/search/fullarchive/accounts/${process.env.GNIP_ACCOUNT}/prod.json`,
+      headers: {
+        Authorization: `Basic ${process.env.GNIP_TOKEN}`
+      },
+      method: 'POST',
+      json: true,
+      body: {
+        query: '"' + tweetText + '"',
+        toDate: moment(tweetTimestamp).format('YYYYMMDDhhmm')
+      }
+    },
+    (error, response, body) => {
+      if (error) {
+        reject(error)
+      } else {
+        if (body && body.results && body.results[0]) {
+          res.send('@' + body.results[0].user.screen_name + ' ' + `https://twitter.com/${body.results[0].user.screen_name}/status/${body.results[0].id_str}`)
+        } else {
+          res.send('FAIL')
+        }
+      }
+    })
+  })
 })
 
 app.listen(process.env.PORT || 8080, () => console.log('listening ' + (process.env.PORT || 8080)))
