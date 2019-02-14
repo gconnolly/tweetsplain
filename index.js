@@ -262,7 +262,7 @@ app.post('/gnip', function(req, res) {
               method: 'POST',
               json: true,
               body: {
-                query: tweet.text,
+                query: '"' + tweet.text + '"',
                 toDate: moment(tweet.created_at).format('YYYYMMDDhhmm')
               }
             },
