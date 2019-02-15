@@ -296,7 +296,8 @@ app.post('/gnip', function(req, res) {
       json: true,
       body: {
         query: '"' + tweetText + '"',
-        toDate: moment(tweetTimestamp).format('YYYYMMDDhhmm')
+        toDate: moment(tweetTimestamp).format('YYYYMMDDhhmm'),
+        maxResults: process.env.GNIP_MAX_RESULTS
       }
     },
     (error, response, body) => {
