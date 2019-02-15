@@ -301,7 +301,7 @@ app.post('/gnip', function(req, res) {
     },
     (error, response, body) => {
       if (error) {
-        reject(error)
+        console.error(error)
       } else {
         if (body && body.results && body.results.length) {
           res.send(body.results)
