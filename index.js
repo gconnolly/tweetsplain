@@ -251,7 +251,7 @@ app.post('/gnip', function(req, res) {
         access.tokenSecret,
         (error, tweet) => {
           if (error) {
-            reject(error)
+            console.error(error)
           } else {
             console.log(tweet)
             request({
@@ -268,7 +268,7 @@ app.post('/gnip', function(req, res) {
             },
             (error, response, body) => {
               if (error) {
-                reject(error)
+                console.error(error)
               } else {
                 if (body && body.results && body.results[0]) {
                   res.send('@' + body.results[0].user.screen_name + ' ' + `https://twitter.com/${body.results[0].user.screen_name}/status/${body.results[0].id_str}`)
